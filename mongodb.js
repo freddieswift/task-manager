@@ -3,10 +3,6 @@ const { MongoClient, ObjectID} = require('mongodb')
 const connectionURL = 'mongodb://127.0.0.1:27017'
 const databaseName = 'task-manager'
 
-// const id = new ObjectID()
-// console.log(id)
-// console.log(id.getTimestamp())
-
 MongoClient.connect(connectionURL, {useNewURLParser: true}, (error, client) => {
     if(error){
         return console.log("Unable to connect to database...")
@@ -14,17 +10,45 @@ MongoClient.connect(connectionURL, {useNewURLParser: true}, (error, client) => {
     
     const db = client.db(databaseName)
 
-    db.collection('users').updateOne({
-        _id: new ObjectID("6176c34fb4dbf1b24101a080")
-    }, {
-        $inc: {
-            age: 1
-        }
+    // db.collection('users').deleteMany({
+    //     age: 22
+    // }).then((result) => {
+    //     console.log(result)
+    // }).catch((error) => {
+    //     console.log(error)
+    // })
+
+    db.collection('tasks').deleteOne({
+        description: "Clean room"
     }).then((result) => {
         console.log(result)
-    }).catch((error)=>{
+    }).catch((error) => {
         console.log(error)
     })
+
+    // db.collection('users').updateOne({
+    //     _id: new ObjectID("6176c34fb4dbf1b24101a080")
+    // }, {
+    //     $inc: {
+    //         age: 1
+    //     }
+    // }).then((result) => {
+    //     console.log(result)
+    // }).catch((error)=>{
+    //     console.log(error)
+    // })
+
+    // db.collection('tasks').updateMany({
+    //     completed: false
+    // }, { 
+    //     $set: {
+    //         completed: true
+    //     }
+    // }).then((result) => {
+    //     console.log(result)
+    // }).catch((error) => {
+    //     console.log(error)
+    // })
 
 
     // db.collection('users').findOne({ _id: new ObjectID("6176c34fb4dbf1b24101a080")}, (error, user)=>{
