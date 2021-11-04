@@ -16,6 +16,16 @@ router.post('/users', async (req, res) => {
     }
 })
 
+router.post('/user/login', async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        res.send(user)
+    }
+    catch (error) {
+        res.status(400).send()
+    }
+})
+
 //Get all users
 router.get('/users', async (req, res) => {
     try {
@@ -62,7 +72,14 @@ router.patch('/users/:id', async (req, res) => {
     ////update the user, specified by the id provided, with data provided in the request body
     const _id = req.params.id
     try {
-        const user = await User.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+        const user = await User.findById(_id)
+
+        updates.forEach((update) => {
+            user[update] = req.body[update]
+        })
+
+        await user.save()
+        
         if (!user) {
             return res.send()
         }
