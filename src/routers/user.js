@@ -16,6 +16,9 @@ router.post('/users', async (req, res) => {
     }
 })
 
+//login user using email and password
+//checks whether there is a user with the email provided and whether the password provided
+//matched the password stored for that user
 router.post('/user/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
@@ -39,6 +42,7 @@ router.get('/users', async (req, res) => {
 
 //Get specific user
 //Get id of user to find from paremter in URL
+//If user is found, send the user data as response
 router.get('/users/:id', async (req, res) => {
     const _id = req.params.id
     try {
@@ -60,6 +64,7 @@ router.patch('/users/:id', async (req, res) => {
     //if the field to be updated is not on the User model, then return an error
     const updates = Object.keys(req.body)
     let allowedUpdates = Object.keys(User.schema.paths)
+    //cannot update id
     allowedUpdates = allowedUpdates.filter(item => item != '_id')
     const isValidOperation = updates.every((update) => {
         return allowedUpdates.includes(update)
@@ -69,20 +74,21 @@ router.patch('/users/:id', async (req, res) => {
         return res.status(400).send({ error: 'Invalid updates!'})
     }
 
-    ////update the user, specified by the id provided, with data provided in the request body
+    //update the user, specified by the id provided, with data provided in the request body
     const _id = req.params.id
     try {
         const user = await User.findById(_id)
 
+        if (!user) {
+            return res.status(404).send()
+        }
+        
         updates.forEach((update) => {
             user[update] = req.body[update]
         })
 
         await user.save()
         
-        if (!user) {
-            return res.send()
-        }
         res.send(user)
     }
     catch (error) {
@@ -92,6 +98,7 @@ router.patch('/users/:id', async (req, res) => {
 
 
 //Delete User
+//If delete is successful, send the data of the user that has been deleted
 router.delete('/users/:id', async (req, res) => {
     const _id = req.params.id
     try{

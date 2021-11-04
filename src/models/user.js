@@ -42,7 +42,9 @@ const userSchema = new mongoose.Schema( {
     }
 })
 
-
+// throws an error if there is no user found with email address provided
+// or if the password provided does not match the password stored for that user
+// if log in is successful, return the user
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
 
@@ -59,7 +61,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
 }
 
-//has plain text password before saving
+//hash plain text password before saving
 userSchema.pre('save', async function(next) {
     const user = this
     if (user.isModified('password')) {

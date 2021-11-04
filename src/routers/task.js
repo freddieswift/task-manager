@@ -29,7 +29,6 @@ router.get('/tasks', async (req, res) => {
 //Get specific task
 router.get('/tasks/:id', async (req, res) => {
     const _id = req.params.id
-
     try {
         const task = await Task.findById(_id)
         if (!task) {
@@ -48,6 +47,7 @@ router.patch('/tasks/:id', async (req, res) => {
     //if the field to be updated is not on the Task model, then return an error
     const updates = Object.keys(req.body)
     let allowedUpdates = Object.keys(Task.schema.paths)
+    //cannot update id
     allowedUpdates = allowedUpdates.filter(item => item != '_id')
     const isValidOperation = updates.every((update) => {
         return allowedUpdates.includes(update)
@@ -61,16 +61,16 @@ router.patch('/tasks/:id', async (req, res) => {
     try {
         const task = await Task.findById(_id)
 
+        if (!task) {
+            return res.status(404).send()
+        }
+
         updates.forEach((update) => {
             task[update] = req.body[update]
         })
 
         await task.save()
         
-        //const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
-        if (!task) {
-            return res.status(404).send()
-        }
         res.send(task)
     }
     catch (error) {
