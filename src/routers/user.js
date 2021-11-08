@@ -2,9 +2,9 @@ const express = require('express')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new express.Router()
+
 //Create User
 //Get user data from request body
-
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
     try {
@@ -21,7 +21,6 @@ router.post('/users', async (req, res) => {
 //login user using email and password
 //checks whether there is a user with the email provided and whether the password provided
 //matched the password stored for that user
-
 router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
@@ -34,8 +33,31 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
-//Get user profile
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token != req.token
+        })
+        await req.user.save()
+        res.send()
+    }
+    catch (error) {
+        res.status(500).send()
+    }
+})
 
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    }
+    catch (error) {
+        res.status(500).send()
+    }
+})
+
+//Get user profile
 router.get('/users/me', auth,  async (req, res) => {
     //get user from authentication middleware
     res.send(req.user)
