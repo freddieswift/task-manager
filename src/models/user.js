@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const {tokenString} = require('../../secrets/secrets')
 const Task = require('./task')
 
-const userSchema = new mongoose.Schema( {
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema( {
             required: true
         }
     }]
+}, {
+    timestamps: true
 })
 
 // throws an error if there is no user found with email address provided
