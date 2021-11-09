@@ -83,6 +83,12 @@ userSchema.methods.toJSON = function () {
     return userObject
 }
 
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'user'
+})
+
 //hash plain text password before saving
 userSchema.pre('save', async function(next) {
     const user = this
