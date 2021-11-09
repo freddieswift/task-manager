@@ -63,28 +63,8 @@ router.get('/users/me', auth,  async (req, res) => {
     res.send(req.user)
 })
 
-//Get specific user
-//Get id of user to find from paremter in URL
-//If user is found, send the user data as response
-
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
-    try {
-        const user = await User.findById(_id)
-        if (!user) {
-            return res.status(400).send()
-        }
-        res.send(user)
-    }
-    catch (error) {
-        console.log(error)
-        res.status(500).send(error)
-    }
-})
-
 //update user
-
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
 
     //checks if the update is valid by comparing the field to be updated with the fields present on the User model
     //if the field to be updated is not on the User model, then return an error
@@ -103,42 +83,23 @@ router.patch('/users/:id', async (req, res) => {
         return res.status(400).send({ error: 'Invalid updates!'})
     }
 
-    //update the user, specified by the id provided, with data provided in the request body
-    //first find the user, apply the updates to user object and save user object
-
-    const _id = req.params.id
     try {
-        const user = await User.findById(_id)
-
-        if (!user) {
-            return res.status(404).send()
-        }
-
         updates.forEach((update) => {
-            user[update] = req.body[update]
+            req.user[update] = req.body[update]
         })
-
-        await user.save()
-        
-        res.send(user)
+        await req.user.save()
+        res.send(req.user)
     }
     catch (error) {
         res.status(400).send(error)
     }
 })
 
-
 //Delete User
-//If delete is successful, send the data of the user that has been deleted
-
-router.delete('/users/:id', async (req, res) => {
-    const _id = req.params.id
+router.delete('/users/me', auth, async (req, res) => {
     try{
-        const user = await User.findByIdAndDelete(_id)
-        if (!user){
-            res.status(404).send()
-        }
-        res.send(user)
+        await req.user.remove()
+        res.send(req.user)
     }
     catch (error) {
         res.status(500).send()
