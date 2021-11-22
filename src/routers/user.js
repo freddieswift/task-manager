@@ -4,7 +4,19 @@ const auth = require('../middleware/auth')
 const router = new express.Router()
 const multer = require('multer')
 
-const upload = multer({ dest: 'avatars' })
+//multer config options - file size = 1mb
+const upload = multer({ 
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.endsWith('.pdf')) {
+            return cb(new Error('Please upload a pdf'))
+        }
+        cb(undefined, true)
+    }
+ })
 
 //Create User
 //Get user data from request body
